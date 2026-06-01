@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  development-container-1:
+    build:
+      context: ./development-container
+      dockerfile: Dockerfile
+    hostname: development-conatiner-1
+    ports:
+      - 3000:3000
+  development-container-2:
+    build:
+      context: ./development-container
+      dockerfile: Dockerfile
+    hostname: development-conatiner-2
+    ports:
+      - 3001:3000

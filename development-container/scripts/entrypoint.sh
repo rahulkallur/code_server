@@ -12,7 +12,7 @@ echo "Installing Visual Studio Code extensions..."
 # Install Visual Studio Code extensions
 extensions=(
 ms-python.python
-redhat.java
+# redhat.java
 golang.Go
 )
 
