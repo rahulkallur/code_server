@@ -1,20 +1,37 @@
 #!/bin/bash
 
-# This script is used to install VS Code extensions in the development container.
-# It is executed during the Docker build process.
-# Make sure to update the list of extensions as needed.
-# The extensions are installed using the `code-server` command line tool.
-# All the extensions insalled are open source and can be found on the Visual Studio Code Marketplace.
-
-# List of extension to install
-
-extensions=(
-ms-python.python
-redhat.java
-)
-
-for ext in "${extensions[@]}";
-do 
+MAX_DEPTH=4
+WORKSPACE_DIR=/home/coder
+install_extension() {
+    local ext="$1"
     echo "Installing ${ext} extension..."
     code-server --install-extension "${ext}"
-done
+}
+
+if find "$WORKSPACE_DIR" -maxdepth "$MAX_DEPTH" -type f \( -name "package.json" -o -name "tsconfig.json" -o -name "*.js" -o -name "*.ts" \) -print -quit | grep -q .; then
+    install_extension "xabikos.JavaScriptSnippets"
+fi
+
+if find . -maxdepth "$MAX_DEPTH" -type f \( -name "requirements.txt" -o -name "pyproject.toml" \) -print -quit | grep -q .; then
+    install_extension ms-python.python
+fi
+
+if find . -maxdepth "$MAX_DEPTH" -type f \( -name "pom.xml" -o -name "build.gradle" -o -name "build.gradle.kts" \) -print -quit | grep -q .; then
+    install_extension redhat.java
+fi
+
+if find . -maxdepth 4 -type f -name "go.mod" -print -quit | grep -q .; then
+    echo "Found go.mod"
+    install_extension "golang.Go"
+fi
+
+if find . -maxdepth "$MAX_DEPTH" -type f -name "composer.json" -print -quit | grep -q .; then
+    install_extension bmewburn.vscode-intelephense-client
+fi
+
+if find . -maxdepth "$MAX_DEPTH" -type f \( -name "*.yaml" -o -name "*.yml" \) -print -quit | grep -q .; then
+    install_extension redhat.vscode-yaml
+    install_extension ms-kubernetes-tools.vscode-kubernetes-tools
+fi
+
+echo "Extension Detection Completed"

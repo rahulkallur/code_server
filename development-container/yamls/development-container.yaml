@@ -1,0 +1,50 @@
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devel-container-deployment-test
+  namespace: dev-container
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devel-container-deployment-test
+  template:
+    metadata:
+      labels:
+        app: devel-container-deployment-test
+    spec:
+      containers:
+        - name: devel-container
+          image: docker.io/rahulkallur/condense-development-container:1.0.0
+          ports:
+            - containerPort: 3000
+          env:
+            # - name: AUTH_TOKEN
+            #   value: SIUDgq39OBOD3oqp8qhd3quldiy8eh2nqe8dqyqudhauwkhdh82dnpwhfrhoug3GIGDWi2
+          # resources:
+          #   limits:
+          #     cpu: "2"
+          #     memory: "2Gi"
+          #   requests:
+          #     cpu: "0.5"
+          #     memory: "500Mi"
+      imagePullSecrets:
+        - name: regcred
+
+---
+
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: devel-container-service-test
+  namespace: dev-container
+spec:
+  selector:
+    app: devel-container-deployment-test
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 3000
+  type: LoadBalancer

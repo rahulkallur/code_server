@@ -7,20 +7,36 @@ export WORKSPACE=/home/coder/project
 
 mkdir -p "$WORKSPACE"
 
-echo "Installing Visual Studio Code extensions..."
+# Initial extension scan
+/usr/local/bin/install-extensions.sh
 
-# Install Visual Studio Code extensions
-extensions=(
-ms-python.python
-# redhat.java
-golang.Go
-)
+# Start watcher in background
+/usr/local/bin/watcher.sh &
 
-for ext in "${extensions[@]}";
-do 
-    echo "Installing ${ext} extension..."
-    code-server --install-extension "${ext}"
-done
+WATCHER_PID=$!
+
+cleanup() {
+    echo "Stopping watcher..."
+    kill "$WATCHER_PID" 2>/dev/null || true
+    exit 0
+}
+
+trap cleanup SIGTERM SIGINT
+
+# echo "Installing Visual Studio Code extensions..."
+
+# # Install Visual Studio Code extensions
+# extensions=(
+# ms-python.python
+# # redhat.java
+# golang.Go
+# )
+
+# for ext in "${extensions[@]}";
+# do 
+#     echo "Installing ${ext} extension..."
+#     code-server --install-extension "${ext}"
+# done
 
 
 echo "Starting code-server..."

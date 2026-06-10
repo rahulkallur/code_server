@@ -13,6 +13,7 @@ RUN apt-get update && \
         curl \
         git \
         jq \
+        inotify-tools \
         ca-certificates && \
     apt-get clean && \
     rm -rf \
@@ -38,7 +39,15 @@ COPY config/config.yaml \
 # Copy startup script
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# Install extensions
+COPY scripts/install-extensions.sh /usr/local/bin/install-extensions.sh
+
+COPY scripts/watcher.sh /usr/local/bin/watcher.sh
+
+RUN chmod +x \
+    /usr/local/bin/install-extensions.sh \
+    /usr/local/bin/watcher.sh \
+    /usr/local/bin/entrypoint.sh
 
 # Fix permissions
 RUN chown -R coder:coder /home/coder

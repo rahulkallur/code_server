@@ -1,0 +1,1 @@
+docker buildx build --platform linux/amd64,linux/arm64 --tag rahulkallur/condense-development-container:1.0.0 --push .

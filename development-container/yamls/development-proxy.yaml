@@ -1,0 +1,57 @@
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devel-proxy
+  namespace: dev-container
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: devel-proxy
+  template:
+    metadata:
+      labels:
+        app: devel-proxy
+    spec:
+      containers:
+        - name: devel-proxy
+          image: docker.io/rahulkallur/condense-development-proxy:1.0.6
+          ports:
+            - containerPort: 80
+          env:
+            - name: DESTINATION_SERVICE_PORT
+              value: "9000"
+            - name: AUTH_URL
+              value: http://condense-admin-service.services.svc.cluster.local:5002/validateToken
+            - name: JWE_K_KEY
+              value: XCY9_Kfd67kPpVeODJe2GULFwHiqjrHQN483zCeW7jU
+            - name: JWE_KID_KEY
+              value: 6bDRV_JGMqFHuzPVF9OvoorYMJhwAGNsdcJ40nNLZbw
+            - name: JWE_SECRET_KEY
+              value: condense_zeliot
+            - name: APP_SECRET
+              value: u2ICiw8nwZlw_vsMOWvR61xQfIDjrtvo
+            - name: PROXY_SERVICE_PORT
+              value: "80"
+          imagePullPolicy: Always
+      imagePullSecrets:
+        - name: regcred
+      
+
+---
+
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: devel-proxy-service
+  namespace: dev-container
+spec:
+  selector:
+    app: devel-proxy
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 80
+  type: ClusterIP
